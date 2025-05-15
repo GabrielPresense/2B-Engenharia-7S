@@ -9,4 +9,13 @@ export class TaskRepository extends Repository<Task> {
     const newTask = taskRepository.create(task);
     return await taskRepository.save(newTask);
   }
+
+  async findAll(): Promise<Task[]> {
+    const taskRepository = AppDataSource.getRepository(Task);
+    return await taskRepository.find({
+      order: {
+        createdAt: 'DESC'
+      }
+    });
+  }
 } 

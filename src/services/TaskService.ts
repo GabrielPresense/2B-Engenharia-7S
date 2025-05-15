@@ -15,4 +15,8 @@ export class TaskService {
 
     return await this.taskRepository.createTask(taskData);
   }
+
+  async findAll(): Promise<Task[]> {
+    return await this.taskRepository.findAll();
+  }
 } 
