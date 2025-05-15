@@ -27,4 +27,8 @@ export class TaskService {
 
     return await this.taskRepository.updateStatus(id, status);
   }
+
+  async delete(id: string): Promise<void> {
+    await this.taskRepository.delete(id);
+  }
 } 

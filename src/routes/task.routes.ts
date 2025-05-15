@@ -7,5 +7,6 @@ const taskController = new TaskController();
 taskRouter.post('/', taskController.create.bind(taskController));
 taskRouter.get('/', taskController.findAll.bind(taskController));
 taskRouter.patch('/:id/status', taskController.updateStatus.bind(taskController));
+taskRouter.delete('/:id', taskController.delete.bind(taskController));
 
 export default taskRouter; 

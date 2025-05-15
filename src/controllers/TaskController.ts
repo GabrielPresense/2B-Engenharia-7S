@@ -45,4 +45,17 @@ export class TaskController {
       return res.status(400).json({ message: error.message });
     }
   }
+
+  async delete(req: Request, res: Response): Promise<Response> {
+    try {
+      const { id } = req.params;
+      await this.taskService.delete(id);
+      return res.status(204).send();
+    } catch (error) {
+      if (error.message === 'Task not found') {
+        return res.status(404).json({ message: error.message });
+      }
+      return res.status(500).json({ message: 'Error deleting task' });
+    }
+  }
 } 

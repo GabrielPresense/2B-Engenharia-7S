@@ -35,4 +35,15 @@ export class TaskRepository extends Repository<Task> {
     task.status = status;
     return await taskRepository.save(task);
   }
+
+  async delete(id: string): Promise<void> {
+    const taskRepository = AppDataSource.getRepository(Task);
+    const task = await this.findById(id);
+    
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    await taskRepository.remove(task);
+  }
 } 
