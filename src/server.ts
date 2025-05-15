@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { DataSource } from 'typeorm';
 import dotenv from 'dotenv';
+import taskRouter from './routes/task.routes';
 
 dotenv.config();
 
@@ -21,6 +22,9 @@ export const AppDataSource = new DataSource({
 });
 
 const PORT = process.env.PORT || 3000;
+
+// Rotas
+app.use('/tasks', taskRouter);
 
 AppDataSource.initialize()
   .then(() => {
