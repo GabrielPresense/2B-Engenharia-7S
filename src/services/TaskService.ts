@@ -1,4 +1,4 @@
-import { Task } from '../models/Task';
+import { Task, TaskStatus } from '../models/Task';
 import { TaskRepository } from '../repositories/TaskRepository';
 
 export class TaskService {
@@ -18,5 +18,13 @@ export class TaskService {
 
   async findAll(): Promise<Task[]> {
     return await this.taskRepository.findAll();
+  }
+
+  async updateStatus(id: string, status: TaskStatus): Promise<Task> {
+    if (!Object.values(TaskStatus).includes(status)) {
+      throw new Error('Invalid status');
+    }
+
+    return await this.taskRepository.updateStatus(id, status);
   }
 } 
