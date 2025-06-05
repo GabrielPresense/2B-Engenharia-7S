@@ -1,14 +1,17 @@
 # API de Gerenciamento de Tarefas
 
-API REST para gerenciamento de tarefas (mini Trello) desenvolvida com Node.js, TypeScript, Express e SQLite.
+API REST para gerenciamento de tarefas (mini Trello) desenvolvida com Node.js, TypeScript, NestJS e SQLite.
 
 ## 🚀 Tecnologias
 
 - Node.js
 - TypeScript
-- Express
+- NestJS
 - TypeORM
 - SQLite
+- JWT
+- Passport
+- Bcrypt
 - CORS
 - Dotenv
 
@@ -33,24 +36,57 @@ npm install
 Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 ```env
 PORT=3000
+JWT_SECRET=sua_chave_secreta_aqui
 ```
 
 ## 🚀 Executando o projeto
 
 ### Desenvolvimento
 ```bash
-npm run dev
+npm run start:dev
 ```
 
 ### Produção
 ```bash
 npm run build
-npm start
+npm run start:prod
 ```
 
 ## 📝 Endpoints da API
 
-### Criar uma tarefa
+### Autenticação
+
+#### Registrar um novo usuário
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+  "email": "usuario@exemplo.com",
+  "password": "senha123",
+  "name": "Nome do Usuário"
+}
+```
+
+#### Login
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "usuario@exemplo.com",
+  "password": "senha123"
+}
+```
+
+### Tarefas (Endpoints Protegidos)
+
+Para acessar os endpoints de tarefas, inclua o token JWT no header:
+```
+Authorization: Bearer seu_token_jwt
+```
+
+#### Criar uma tarefa
 ```http
 POST /tasks
 Content-Type: application/json
@@ -61,12 +97,17 @@ Content-Type: application/json
 }
 ```
 
-### Listar todas as tarefas
+#### Listar todas as tarefas
 ```http
 GET /tasks
 ```
 
-### Atualizar status de uma tarefa
+#### Buscar uma tarefa específica
+```http
+GET /tasks/:id
+```
+
+#### Atualizar status de uma tarefa
 ```http
 PATCH /tasks/:id/status
 Content-Type: application/json
@@ -81,7 +122,7 @@ Status válidos:
 - `in_progress`
 - `done`
 
-### Remover uma tarefa
+#### Remover uma tarefa
 ```http
 DELETE /tasks/:id
 ```
@@ -92,20 +133,23 @@ DELETE /tasks/:id
 src/
 ├── controllers/     # Controladores da aplicação
 ├── models/         # Modelos de dados
-├── repositories/   # Camada de acesso a dados
-├── routes/         # Definição das rotas
 ├── services/       # Lógica de negócio
-└── server.ts       # Arquivo principal
+├── guards/         # Guards de autenticação
+├── strategies/     # Estratégias de autenticação
+├── modules/        # Módulos da aplicação
+└── main.ts         # Arquivo principal
 ```
 
 ## 🛠️ Arquitetura
 
-O projeto segue uma arquitetura em camadas:
+O projeto segue a arquitetura do NestJS:
 
 - **Controller**: Responsável por receber as requisições HTTP e retornar as respostas
 - **Service**: Contém a lógica de negócio da aplicação
-- **Repository**: Responsável pelo acesso aos dados
-- **Model**: Define a estrutura dos dados
+- **Model**: Define a estrutura dos dados usando TypeORM
+- **Module**: Organiza e configura os componentes da aplicação
+- **Guard**: Protege rotas que necessitam de autenticação
+- **Strategy**: Implementa estratégias de autenticação
 
 ## 📄 Licença
 

@@ -1,34 +1,42 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Task, TaskStatus } from '../models/Task';
-import { TaskRepository } from '../repositories/TaskRepository';
 
+@Injectable()
 export class TaskService {
-  private taskRepository: TaskRepository;
+  constructor(
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
+  ) {}
 
-  constructor() {
-    this.taskRepository = new TaskRepository();
-  }
-
-  async createTask(taskData: Partial<Task>): Promise<Task> {
-    if (!taskData.title || !taskData.description) {
-      throw new Error('Title and description are required');
-    }
-
-    return await this.taskRepository.createTask(taskData);
+  async create(createTaskDto: { title: string; description: string }): Promise<Task> {
+    const task = this.taskRepository.create(createTaskDto);
+    return this.taskRepository.save(task);
   }
 
   async findAll(): Promise<Task[]> {
-    return await this.taskRepository.findAll();
+    return this.taskRepository.find();
+  }
+
+  async findOne(id: string): Promise<Task> {
+    const task = await this.taskRepository.findOne({ where: { id } });
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+    return task;
   }
 
   async updateStatus(id: string, status: TaskStatus): Promise<Task> {
-    if (!Object.values(TaskStatus).includes(status)) {
-      throw new Error('Invalid status');
-    }
-
-    return await this.taskRepository.updateStatus(id, status);
+    const task = await this.findOne(id);
+    task.status = status;
+    return this.taskRepository.save(task);
   }
 
-  async delete(id: string): Promise<void> {
-    await this.taskRepository.delete(id);
+  async remove(id: string): Promise<void> {
+    const result = await this.taskRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
   }
 } 

@@ -1,61 +1,38 @@
-import { Request, Response } from 'express';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { TaskService } from '../services/TaskService';
-import { TaskStatus } from '../models/Task';
+import { Task, TaskStatus } from '../models/Task';
+import { JwtAuthGuard } from '../guards/JwtAuthGuard';
 
+@Controller('tasks')
+@UseGuards(JwtAuthGuard)
 export class TaskController {
-  private taskService: TaskService;
+  constructor(private readonly taskService: TaskService) {}
 
-  constructor() {
-    this.taskService = new TaskService();
+  @Post()
+  create(@Body() createTaskDto: { title: string; description: string }): Promise<Task> {
+    return this.taskService.create(createTaskDto);
   }
 
-  async create(req: Request, res: Response): Promise<Response> {
-    try {
-      const task = await this.taskService.createTask(req.body);
-      return res.status(201).json(task);
-    } catch (error) {
-      return res.status(400).json({ message: error.message });
-    }
+  @Get()
+  findAll(): Promise<Task[]> {
+    return this.taskService.findAll();
   }
 
-  async findAll(req: Request, res: Response): Promise<Response> {
-    try {
-      const tasks = await this.taskService.findAll();
-      return res.status(200).json(tasks);
-    } catch (error) {
-      return res.status(500).json({ message: 'Error fetching tasks' });
-    }
+  @Get(':id')
+  findOne(@Param('id') id: string): Promise<Task> {
+    return this.taskService.findOne(id);
   }
 
-  async updateStatus(req: Request, res: Response): Promise<Response> {
-    try {
-      const { id } = req.params;
-      const { status } = req.body;
-
-      if (!status) {
-        return res.status(400).json({ message: 'Status is required' });
-      }
-
-      const task = await this.taskService.updateStatus(id, status as TaskStatus);
-      return res.status(200).json(task);
-    } catch (error) {
-      if (error.message === 'Task not found') {
-        return res.status(404).json({ message: error.message });
-      }
-      return res.status(400).json({ message: error.message });
-    }
+  @Patch(':id/status')
+  updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: TaskStatus,
+  ): Promise<Task> {
+    return this.taskService.updateStatus(id, status);
   }
 
-  async delete(req: Request, res: Response): Promise<Response> {
-    try {
-      const { id } = req.params;
-      await this.taskService.delete(id);
-      return res.status(204).send();
-    } catch (error) {
-      if (error.message === 'Task not found') {
-        return res.status(404).json({ message: error.message });
-      }
-      return res.status(500).json({ message: 'Error deleting task' });
-    }
+  @Delete(':id')
+  remove(@Param('id') id: string): Promise<void> {
+    return this.taskService.remove(id);
   }
 } 
