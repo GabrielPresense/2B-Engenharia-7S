@@ -18,5 +18,5 @@ public class RegisterRequest {
     @NotBlank(message = "Senha é obrigatória")
     private String password;
     
-    private Role role = Role.ROLE_USER; // Por padrão, novos usuários são ROLE_USER
+    private Role role = Role.ROLE_USER;
 } 
